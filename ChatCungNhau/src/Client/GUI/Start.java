@@ -37,6 +37,7 @@ public class Start extends javax.swing.JFrame {
         Form.start = this;
         flag = true;
         time= 0;
+        lbUser.setText(BUS.user);
     }
 
     

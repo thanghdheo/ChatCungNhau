@@ -56,16 +56,26 @@ public class WorkerServer implements Runnable {
                         case "DONGYVAOPHONG":
                             kiemtra();
                             break;
+                        case "LOADCHAT":
+                            chuanbichat();
+                            break;
+                        case "MESSAGE":
+                            hanldemessage();
+                            break;
+                        case "OUTCHAT":
+                            outchat();
+                            break;
+                        default: break;
                     }
-                } catch (IOException ex) {
+                } catch (Exception ex) {
                     break;
                 }
             }
-            System.out.println("user " + user + " disconected");
-            System.out.println("User online: " + ServerBUS.users.size());
+            clean();
             in.close();
             out.close();
             socket.close();
+            System.out.println("Đóng");
         } catch (IOException ex) {
             Logger.getLogger(WorkerServer.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -313,4 +323,69 @@ public class WorkerServer implements Runnable {
             sendRoomID(0, 1);
         }
     }
+
+    private void chuanbichat() throws IOException {
+        System.out.println("Chuan bi chat");
+        workerUser2 = layNguoiDung2();
+        if (workerUser2 != null) {
+            thongtinUser2();
+            out.write("PREPARESUCCESS" + "\n");
+            System.out.println(user + " hoàn tất!");
+        } else {
+            out.write("PREPAREFAILED" + "\n");
+            System.out.println("Khởi tạo user " + user + " thất bại!");
+        }
+        out.flush();
+    }
+
+    private WorkerServer layNguoiDung2() {
+        for (WorkerServer w : ServerBUS.chatWorkers)
+            if (w.roomId.equals(roomId) && w.user.equals(user2))
+                return w;
+        return null;
+    }
+
+    private void thongtinUser2() throws IOException {
+        out.write("INFOUSER" + "\n");
+        out.write(user2 + "\n");
+        out.flush();
+    }
+
+    private void hanldemessage() throws IOException {
+        workerUser2.out.write("MESSAGE" + "\n");
+        workerUser2.out.write(in.readLine() + "\n");
+        workerUser2.out.flush();
+    }
+
+    private void outchat() throws IOException {
+        System.out.println("Thoát phòng");
+        workerUser2.out.write("OUTCHATNOTI" + "\n");
+        workerUser2.out.flush();
+        clear();
+    }
+
+    private void clear() {
+        workerUser2 = null;
+        user2 = null;
+        roomId = null;
+        ServerBUS.chatWorkers.remove(this);
+    }
+    
+    private void clean() throws IOException {
+        for (Room r : ServerBUS.waittingRooms) {
+            if (r.getUser1().equals(user)) {
+                r.setUser1Accept(r.DENY);
+                System.out.println("user " + user + " disconnected game");
+                break;
+            } else if (r.getUser2().equals(user)) {
+                r.setUser2Accept(r.DENY);
+                System.out.println("user " + user + " disconnected game");
+                break;
+            }
+        }
+        ServerBUS.users_waitting.remove(user);
+        ServerBUS.users.remove(user);
+        ServerBUS.workers.remove(this);
+    }
+    
 }

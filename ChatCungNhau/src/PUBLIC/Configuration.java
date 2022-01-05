@@ -10,6 +10,6 @@ package PUBLIC;
  */
 public class Configuration {
     public static final String SERVER = "localhost";
-    public static final int PORT = 2412;
+    public static final int PORT = 2000;
     public static final int NUM_THREAD = 10;
 }

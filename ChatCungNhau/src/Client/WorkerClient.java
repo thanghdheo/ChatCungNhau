@@ -4,6 +4,7 @@
  */
 package Client;
 
+import static Client.Form.main;
 import static Client.Form.start;
 import Client.GUI.Main;
 import Client.GUI.Start;
@@ -29,7 +30,6 @@ public class WorkerClient implements Runnable {
     private final BufferedWriter out;
     public static int status;
     public static boolean isContinue;
-    public static Start start;
 
     public WorkerClient(Socket s) throws IOException {
         this.socket = s;
@@ -62,6 +62,21 @@ public class WorkerClient implements Runnable {
                         break;
                     case "LOADCHAT":
                         loadChat();
+                        break;
+                    case "INFOUSER":
+                        thongtinUser();
+                        break;
+                    case "PREPARESUCCESS":
+                        chuanbichatsc();
+                        break;
+                    case "PREPAREFAILED":
+                        chuanbichatfailed();
+                        break;
+                    case "MESSAGE":
+                        hanldemessage();
+                        break;
+                    case "OUTCHATNOTI":
+                        outchat();
                         break;
                 }
             } catch (IOException ex) {
@@ -125,10 +140,43 @@ public class WorkerClient implements Runnable {
     }
 
     private void loadChat() throws IOException {
-        System.out.println("Bắt đầu chat");
+        System.out.println("Chuẩn bị");
         out.write("LOADCHAT" + "\n");
         out.flush();
-        Form.hideStart();
+        if (start != null) {
+            start.setVisible(false);
+        }
+    }
+
+    private void thongtinUser() throws IOException {
+        BUS.user2 = in.readLine();
+    }
+
+    private void chuanbichatsc() {
+        System.out.println("Vui lòng chờ");
+        main = new Main();
+        main.setVisible(true);
+    }
+
+    private void chuanbichatfailed() {
+        JOptionPane.showMessageDialog(null, "Phòng chat đã bị huỷ do lỗi ");
+        start = new Start();
+        start.setVisible(true);
+    }
+
+    private void hanldemessage() throws IOException {
+        Main.txMain.append(BUS.user2 + ": " + in.readLine() + "\n");
+    }
+
+    private void outchat() throws IOException {
+        out.write("CLEAR" + "\n");
+        out.flush();
+        JOptionPane.showMessageDialog(null, "Bạn của bạn đã rời phòng !!! kết thúc!");
+        if (main != null) {
+            main.setVisible(false);
+        }
+        start = new Start();
+        start.setVisible(true);
     }
 
 }

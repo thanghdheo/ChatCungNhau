@@ -4,6 +4,10 @@
  */
 package Client.GUI;
 
+import Client.BUS;
+import Client.Form;
+import static Client.Form.start;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UIManager;
@@ -27,7 +31,9 @@ public class Main extends javax.swing.JFrame {
         initComponents();
         this.setTitle("");
         this.setLocationRelativeTo(null);
-        
+        Form.main=this;
+        txMain.setLineWrap(true);
+        txMain.setWrapStyleWord(true);
     }
 
     /**
@@ -46,14 +52,30 @@ public class Main extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         txMain.setColumns(20);
         txMain.setRows(5);
+        txMain.setEnabled(false);
         jScrollPane1.setViewportView(txMain);
 
         txtChat.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        txtChat.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtChatKeyPressed(evt);
+            }
+        });
 
         btnSend.setText("Gửi");
+        btnSend.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSendActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -84,41 +106,52 @@ public class Main extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
+        // TODO add your handling code here:
+        if (!txtChat.getText().trim().equals("")) {
+            try {
+                txMain.append("Tôi: " + txtChat.getText().trim() + "\n");
+                System.out.println(txtChat.getText());
+                BUS.out.write("MESSAGE" + "\n");
+                BUS.out.write(txtChat.getText().trim() + "\n");
+                BUS.out.flush();
+                txtChat.setText("");
+            } catch (IOException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_btnSendActionPerformed
+
+    private void txtChatKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtChatKeyPressed
+        // TODO add your handling code here:
+        if (!txtChat.getText().trim().equals("")) {
+            try {
+                txMain.append("Tôi: " + txtChat.getText().trim() + "\n");
+                System.out.println(txtChat.getText());
+                BUS.out.write("MESSAGE" + "\n");
+                BUS.out.write(txtChat.getText().trim() + "\n");
+                BUS.out.flush();
+                txtChat.setText("");
+            } catch (IOException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_txtChatKeyPressed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+
+        Form.start.setVisible(true);
+        try {
+            BUS.out.write("OUTCHAT" + "\n");
+            BUS.out.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_formWindowClosing
+
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Main().setVisible(true);
-            }
-        });
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public static javax.swing.JButton btnSend;
     private javax.swing.JScrollPane jScrollPane1;
