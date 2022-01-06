@@ -7,6 +7,7 @@ package Client.GUI;
 import Client.BUS;
 import Client.Form;
 import static Client.Form.start;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,7 +24,7 @@ public class Main extends javax.swing.JFrame {
      * Creates new form Main
      */
     public Main() {
-         try {
+        try {
             UIManager.setLookAndFeel(new com.jtattoo.plaf.graphite.GraphiteLookAndFeel());
         } catch (UnsupportedLookAndFeelException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -31,7 +32,7 @@ public class Main extends javax.swing.JFrame {
         initComponents();
         this.setTitle("");
         this.setLocationRelativeTo(null);
-        Form.main=this;
+        Form.main = this;
         txMain.setLineWrap(true);
         txMain.setWrapStyleWord(true);
     }
@@ -124,16 +125,18 @@ public class Main extends javax.swing.JFrame {
 
     private void txtChatKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtChatKeyPressed
         // TODO add your handling code here:
-        if (!txtChat.getText().trim().equals("")) {
-            try {
-                txMain.append("Tôi: " + txtChat.getText().trim() + "\n");
-                System.out.println(txtChat.getText());
-                BUS.out.write("MESSAGE" + "\n");
-                BUS.out.write(txtChat.getText().trim() + "\n");
-                BUS.out.flush();
-                txtChat.setText("");
-            } catch (IOException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (!txtChat.getText().trim().equals("")) {
+                try {
+                    txMain.append("Tôi: " + txtChat.getText().trim() + "\n");
+                    System.out.println(txtChat.getText());
+                    BUS.out.write("MESSAGE" + "\n");
+                    BUS.out.write(txtChat.getText().trim() + "\n");
+                    BUS.out.flush();
+                    txtChat.setText("");
+                } catch (IOException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }//GEN-LAST:event_txtChatKeyPressed

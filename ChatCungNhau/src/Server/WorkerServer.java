@@ -65,6 +65,9 @@ public class WorkerServer implements Runnable {
                         case "OUTCHAT":
                             outchat();
                             break;
+                        case "CLEAR":
+                            clear();
+                            break;
                         default: break;
                     }
                 } catch (Exception ex) {
